@@ -1,0 +1,51 @@
+{
+  "name": "toctalk",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@hookform/resolvers": "^3.3.2",
+    "@monaco-editor/react": "^4.6.0",
+    "@visx/visx": "^3.3.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "cytoscape": "^3.33.0",
+    "d3": "^7.8.5",
+    "file-saver": "^2.0.5",
+    "framer-motion": "^10.16.4",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.292.0",
+    "monaco-editor": "^0.44.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.47.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.8.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "reactflow": "^11.11.4",
+    "tailwind-merge": "^2.0.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@types/react-syntax-highlighter": "^15.5.11",
+    "@vitejs/plugin-react": "^4.1.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^4.5.0"
+  }
+}

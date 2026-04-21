@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.rag_chroma_db/
+notebooks/.rag_chroma_db/
+notebooks/.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
