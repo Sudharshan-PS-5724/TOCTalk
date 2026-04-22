@@ -1,0 +1,389 @@
+================================================================================
+ SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
+================================================================================
+ Product Name:        TOCTalk
+ Subtitle:            Gamified Theory of Computation — Learn, Simulate, Prove
+ Document Version:    2.0
+ Status:              Draft for implementation
+ Primary Stack:       React 18 + Vite, Tailwind CSS, Node.js (optional API)
+ Reference Curriculum: Elaine Rich, Automata, Computability and Complexity:
+                       Theory and Applications (Draft, Jan. 2007). Local PDF:
+                       AutomataTheoryBook.pdf (repository root). Module order
+                       and labels SHOULD follow this book unless an instructor
+                       overrides (see §1.4.2).
+================================================================================
+
+1. INTRODUCTION
+
+1.1 Purpose
+This document specifies functional and non-functional requirements for TOCTalk,
+a single-page web application that teaches Theory of Computation through
+interactive simulations, structured explanations, formal proofs with step
+playback, practice tasks, and game mechanics (progression, rewards, challenges).
+
+1.2 Goals
+- Cover a complete TOC syllabus suitable for CS undergraduates and competitive
+  exam preparation (e.g. GATE-style problem types where applicable).
+- Make abstract objects (automata, grammars, tapes) tangible via visual editors
+  and step-by-step execution traces.
+- Reduce cognitive load via consistent UI, glossary tooltips, optional “ELI5”
+  explanations, and accessibility.
+- Support both self-paced learners and instructors (demo, assignment export).
+
+1.3 Definitions, Acronyms, Abbreviations
+- FA: Finite automaton. DFA/NFA/ε-NFA as standard.
+- PDA: Pushdown automaton. TM: Turing machine. CFG: Context-free grammar.
+- CNF/GNF: Chomsky / Greibach normal forms.
+- SRS: This document. TOC: Theory of Computation.
+
+1.4 References
+
+1.4.1 Primary textbook (authoritative for navigation & onboarding)
+- Rich, Elaine. Automata, Computability and Complexity: Theory and Applications.
+  Draft, January 2007. (PDF metadata may list other names; body text credits
+  Elaine Rich.) Repository file: AutomataTheoryBook.pdf (≈889 pages).
+- Sections marked optional or “advanced” in the book’s table of contents map to
+  optional TOCTalk “deep dive” units, not core MVP gates.
+
+1.4.2 Chapter-to-feature mapping (TOCTalk modules)
+  PART I — Introduction
+  - Ch.1–4: Dashboard “Why TOC?”, strings & languages, hierarchy diagram,
+    computation basics → Learn path prerequisites and glossary hooks.
+
+  PART II — Finite state machines & regular languages
+  - Ch.5 FSM: DFA/NFA, design, minimization, simulators → Automata Lab (core).
+  - Ch.5 (optional advanced): transducers, stochastic FA, Büchi → optional labs.
+  - Ch.6 Regular expressions: Kleene’s theorem, RE tools → Regex & conversions.
+  - Ch.7 Regular grammars: ↔ FA → Grammar bridge (regular).
+  - Ch.8–9 Regular/nonregular, closure, pumping (regular), decision procedures
+    → Proofs (regular PL), Properties & Quiz bank.
+
+  PART III — Context-free languages & pushdown automata
+  - Ch.11 CFG: rewrite systems, parse trees, ambiguity, normal forms →
+    Grammar Lab (core); CNF per Ch.11.8.
+  - Ch.12 PDA: definition, equivalence with CFG → PDA Lab (core).
+  - Ch.13–14 CFL/non-CFL, pumping (CFL), CFL decision problems → Proofs (CFL),
+    Decidability (CFL questions).
+  - Ch.15 Parsing (optional): lexical/top-down/bottom-up → optional “Compiler
+    bridge” or future module.
+
+  PART IV — Turing machines & undecidability
+  - Ch.17–18 TM, Church–Turing → Turing Machine Lab; thesis (read-only).
+  - Ch.19–22 Halting, D/SD, reductions, Rice, PCP, etc. → Decidability Lab
+    (interactive demos + guided proofs).
+  - Ch.23–25 Unrestricted grammars, Chomsky hierarchy, computable functions →
+    Advanced theory track (optional).
+
+  PART V — Complexity
+  - Ch.27–31 Complexity zoo, P/NP, NP-completeness, space, heuristics →
+    Complexity module (interactive reductions where feasible).
+
+  Appendices
+  - App. A (math background): inline tooltips / “math refresh” drawer.
+  - App. B (proof details): citations from Proofs module.
+  - App. C (applications): “Why it matters” stories; optional reading links.
+
+1.4.3 Secondary references
+- Hopcroft, Motwani, Ullman; Sipser — terminology cross-checks only.
+
+1.5 Document Overview
+Sections 2–4 describe context, users, and scope. Sections 5–7 specify functional
+requirements by domain. Sections 8–10 cover gamification, UX, and NFRs.
+Sections 11–14 cover architecture, data, testing, and traceability.
+
+================================================================================
+2. OVERALL DESCRIPTION
+================================================================================
+
+2.1 Product Perspective
+TOCTalk is a client-heavy educational SPA. Core algorithms (simulation, subset
+construction, minimization, grammar transforms) SHOULD run in the browser for
+low latency; optional Node.js services MAY offload heavy or sandboxed parsing,
+export (PDF/Graphviz), or future collaboration.
+
+2.2 User Classes
+- Student (primary): builds automata, runs drills, earns progression.
+- Instructor: uses read-only or “assignment” views, exports, embed links.
+- Visitor: read-only tour or limited sandbox without saving progress.
+
+2.3 Operating Environment
+Modern evergreen browsers (last two major versions of Chrome, Firefox, Edge,
+Safari). Desktop-first; tablet usable for viewing and light editing.
+
+2.4 Constraints
+- Simulations MUST bound step counts and recursion/stack depth to avoid UI freeze.
+- User-supplied regex/grammar strings MUST be validated and size-limited.
+- No requirement for native mobile apps in v1; responsive web is sufficient.
+
+2.5 Assumptions
+- Alphabet sizes are small (typical teaching examples: 2–5 symbols).
+- Syllabus order and naming for student-facing content SHOULD default to Rich
+  (AutomataTheoryBook.pdf) as in §1.4.2.
+
+================================================================================
+3. SCOPE
+================================================================================
+
+3.1 In Scope (Release Targets)
+- Interactive editors and simulators: DFA, NFA, ε-NFA, PDA, TM (single-tape
+  deterministic model with configurable tape alphabet for teaching).
+- Regular languages: RE ↔ automata constructions, subset construction,
+  minimization (table or partition refinement), decision properties for regular
+  languages (emptiness, finiteness, membership, equivalence with teacher-provided
+  oracles where automated check is infeasible).
+- Context-free languages: CFG editing, CNF (and optionally GNF) conversion,
+  ambiguity warnings (heuristic), PDA simulation with visible stack.
+- Proof assistants (guided): Pumping lemmas (regular + CFL), Myhill–Nerode
+  intuition, Kleene/Arden-style walkthroughs (where automatable).
+- Decidability & complexity (introductory): halting problem demo, reductions
+  explained visually, P/NP/PSPACE overview with example problems (not full
+  proof automation).
+- Quiz engine: structured items with autograding where possible (DFA/regex
+  equivalence checks, simulation outcomes).
+- Gamification: XP, levels, streaks, badges, quests, optional daily challenge.
+- Export/share: JSON schema for machines and grammars; Graphviz DOT; PNG/PDF
+  snapshot of canvas where feasible.
+
+3.2 Out of Scope (Initial Releases)
+- Full compiler frontend/backend pipeline (beyond illustrative snippets).
+- Real-time multiplayer collaboration (future).
+- Weighted/timed/probabilistic automata beyond brief “extension” notes.
+- Formal verification of arbitrary user proofs (only structured templates).
+
+3.3 Compiler Design Naming
+The product focuses on Theory of Computation. “Compiler Design” appears only as
+optional future extension (lexical analysis tie-ins); it is not a v1 deliverable.
+
+================================================================================
+4. USER NEEDS & USE CASES (SUMMARY)
+================================================================================
+
+UC-A1: Construct a DFA and test membership on strings; view rejected/accepted path.
+UC-A2: Convert NFA → DFA with animated subset construction; compare languages.
+UC-A3: Minimize DFA and replay partition refinement.
+UC-B1: Enter a regex; obtain ε-NFA via Thompson; determinize if requested.
+UC-C1: Enter a CFG; convert to CNF; show parse/derivation for a string (when parse
+       exists).
+UC-D1: Run a PDA with stack visualization; step forward/back.
+UC-E1: Run a TM; observe tape head; detect step limit exceeded.
+UC-F1: Complete a pumping-lemma template for a given non-regular language claim.
+UC-G1: Earn XP for completing a module quiz; maintain daily streak.
+
+================================================================================
+5. FUNCTIONAL REQUIREMENTS — CONTENT & ALGORITHMS
+================================================================================
+
+5.1 Finite Automata (Regular Languages)
+FR-FA-01: User SHALL create, rename, and delete states; set exactly one initial
+          state; set zero or more accepting states.
+FR-FA-02: User SHALL add directed transitions labeled with symbols or sets (NFA);
+          ε-transitions supported in ε-NFA mode.
+FR-FA-03: System SHALL simulate step-by-step execution on an input string with
+          visible current state(s); deterministic mode resolves NFA by showing
+          active state set or chosen path per policy (configurable: BFS path or
+          user-picked branch for teaching).
+FR-FA-04: System SHALL implement powerset construction from NFA/ε-NFA to DFA with
+          optional animation of state discovery order.
+FR-FA-05: System SHALL implement DFA minimization (Hopcroft or table-filling) and
+          display distinguishable pairs / blocks before merge.
+FR-FA-06: System SHALL support decision checks where decidable for regular
+          languages: emptiness, finiteness, membership; universality for small
+          DFAs via complement+emptiness when alphabet is fixed and small.
+
+5.2 Regular Expressions & Conversions
+FR-RE-01: User SHALL input a regex over a declared alphabet with standard ops
+          (union, concat, Kleene star, grouping); system SHALL reject malformed
+          input with clear errors.
+FR-RE-02: System SHALL construct ε-NFA via Thompson’s construction and allow
+          export to canvas.
+FR-RE-03: System SHALL support regex from DFA via state elimination (teaching
+          mode may restrict graph shape).
+
+5.3 Context-Free Grammars
+FR-CFG-01: User SHALL edit productions in text form with syntax highlighting;
+           system SHALL parse and display nonterminals/terminals.
+FR-CFG-02: System SHALL eliminate left recursion (classic algorithm) where
+           applicable and report if grammar not suitable.
+FR-CFG-03: System SHALL convert CFG → CNF with step log; GNF MAY be Phase 2+.
+FR-CFG-04: System SHALL attempt derivation for user string (CYK for CNF strings
+           when alphabet terminal size is manageable) OR LL-style for restricted
+           grammars; limitations MUST be documented in UI.
+
+5.4 Pushdown Automata
+FR-PDA-01: User SHALL define states, stack alphabet symbols, transitions that
+           read input/top-of-stack and push/pop; invalid transitions rejected.
+FR-PDA-02: System SHALL simulate PDA with stack display and infinite-step guard.
+
+5.5 Turing Machines
+FR-TM-01: User SHALL define a deterministic TM with explicit transitions
+          (read, write, move L/R); tape SHALL be visible with configurable max
+          steps and tape bounds.
+FR-TM-02: System SHALL provide halting vs non-halting outcome when within step
+          limit; otherwise “unknown within limit” outcome.
+
+5.6 Proof & Reasoning Modules (Guided)
+FR-PR-01: Pumping lemma (regular): template for choosing p, splitting xyz,
+          pumping i, contradiction — user fills steps; system validates format
+          and provides hints.
+FR-PR-02: Pumping lemma (CFL): block length selection and string z = uvwxy
+          decomposition template.
+FR-PR-03: Myhill–Nerode: interactive distinguisher game for sample languages
+          (finite set of prefixes).
+FR-PR-04: Kleene/Arden: equation display with substitution steps (where coded).
+
+5.7 Decidability & Complexity (Introductory)
+FR-DC-01: Static explanations + interactive toggles for decidable vs undecidable
+          examples; “halting problem” demo with fixed small programs only.
+FR-DC-02: Reduction walkthrough: predefined instances (e.g. 3-SAT → CLIQUE) with
+          diagrammatic mapping — not arbitrary user NP reductions.
+
+5.8 Quiz & Assessment
+FR-QZ-01: Item types: multiple choice, build automaton to spec, minimize given
+          DFA, regex→automaton, trace simulation.
+FR-QZ-02: Autograding: structural equality of DFAs modulo isomorphism (within
+          performance limits); simulation-based checks; regex equivalence for
+          small alphabets via derivative or brute enumeration with caps.
+FR-QZ-03: Instructor MAY export quiz package as JSON.
+
+5.9 Sharing & Export
+FR-EX-01: Serialize automaton/grammar to versioned JSON schema.
+FR-EX-02: Export Graphviz DOT for FA graphs.
+FR-EX-03: Encode shareable URL with compressed payload OR short id if backend
+          exists; size limits enforced.
+
+================================================================================
+6. FUNCTIONAL REQUIREMENTS — GAMIFICATION
+================================================================================
+
+FR-GM-01: User account MAY be local-only (browser profile) or optional server
+          account; progression MUST persist in local storage at minimum.
+FR-GM-02: XP SHALL be awarded for: completing lessons, correct quiz attempts,
+          first-time module completion, daily challenge.
+FR-GM-03: Levels SHALL map to cumulative XP thresholds; UI SHALL show progress.
+FR-GM-04: Badges SHALL exist per domain (e.g. “Subset Constructor”, “CNF Chef”,
+          “PDA Pilot”, “TM Operator”).
+FR-GM-05: Quests SHALL chain tasks (e.g. “Build DFA → Minimize → Export DOT”).
+FR-GM-06: Streaks SHALL count consecutive days with at least one completed task;
+          grace period MAY be configurable.
+FR-GM-07: Hints MAY cost soft currency (earned XP) to discourage over-reliance.
+FR-GM-08: Sandbox mode SHALL allow free play without XP penalties.
+
+================================================================================
+7. USER INTERFACE & EXPERIENCE
+================================================================================
+
+7.1 Information Architecture
+- Home / Dashboard: progress, streak, recommended next topic.
+- Learn: syllabus tree aligned with textbook chapters when available.
+- Labs: Automata, Grammar, Proofs, Decidability/Complexity, Quiz.
+- Profile: badges, stats, settings (accessibility).
+
+7.2 Layout Patterns
+Dual-pane: interactive model left; explanation / step log / table right.
+Responsive: stack panes vertically on narrow screens.
+
+7.3 Accessibility
+Keyboard navigation for simulation controls; focus outlines; WCAG-oriented
+contrast; reduced-motion option respecting prefers-reduced-motion.
+
+7.4 Localization
+English v1; string externalization recommended for future locales.
+
+================================================================================
+8. NON-FUNCTIONAL REQUIREMENTS
+================================================================================
+
+NFR-PERF-01: FA simulation for ≤100 states and typical strings SHALL complete
+             interaction within 100 ms per step on mid-range laptops (best effort).
+NFR-PERF-02: Grammar conversions SHALL complete within 200 ms for teaching-sized
+             grammars (≤50 productions) or show progress indicator.
+NFR-REL-01: App SHALL remain responsive under errors; no unhandled promise rejections.
+NFR-SEC-01: Sanitize all text inputs; cap sizes; avoid eval of user code.
+NFR-MAIN-01: Components SHALL be modular; algorithms isolated from UI for tests.
+NFR-ACC-01: See 7.3; colorblind-safe palettes for state highlighting.
+
+================================================================================
+9. SYSTEM ARCHITECTURE (LOGICAL)
+================================================================================
+
+9.1 Frontend Layers
+- Presentation: React pages, layout, design system.
+- Feature modules: automata, grammar, proofs, quiz, gamification shell.
+- Domain logic: pure TS/JS modules for algorithms (no DOM).
+- Persistence: localStorage adapter; optional API client.
+
+9.2 Optional Backend
+Node.js service for: heavy CYK, PDF rendering, link shortener, future accounts.
+Not required for MVP if browser limits are acceptable.
+
+9.3 Visualization & Tables (see implementation plan)
+State diagrams: React Flow (xyflow) or Cytoscape for layout-heavy graphs;
+transition tables: TanStack Table or lightweight editable grid; math: KaTeX
+optional for notation-heavy pages.
+
+================================================================================
+10. DATA REQUIREMENTS
+================================================================================
+
+10.1 Core Entities
+- UserProgress: { xp, level, streakLastDate, completedLessonIds[], badgeIds[] }.
+- AutomatonGraph: { version, type, states[], transitions[], alphabet, initial,
+                    accepting }.
+- GrammarModel: { version, nonterminals[], terminals[], productions[] }.
+- QuizAttempt: { itemId, answerPayload, score, timestamp }.
+
+10.2 JSON Schema
+Each entity SHALL have a version field for forward compatibility.
+
+================================================================================
+11. EXTERNAL INTERFACES
+================================================================================
+
+11.1 Browser APIs: localStorage, Clipboard (export), optional File System Access.
+11.2 No mandatory third-party analytics in v1; if added, require consent.
+
+================================================================================
+12. TESTING & QUALITY
+================================================================================
+
+12.1 Unit tests for: subset construction, minimization, Thompson, CYK (bounded),
+      PDA/TM step engines.
+12.2 Snapshot tests for critical UI components (transition table render).
+12.3 Manual test checklist per release: accessibility, keyboard-only path.
+
+================================================================================
+13. REQUIREMENTS TRACEABILITY (HIGH LEVEL)
+================================================================================
+
+Module            | FR Sections        | NFRs
+------------------|--------------------|----------
+Automata Lab      | 5.1, 5.2, 5.9      | PERF, SEC
+Grammar Lab       | 5.3, 5.9          | PERF, SEC
+PDA/TM Labs       | 5.4, 5.5          | PERF, SEC
+Proofs            | 5.6               | ACC
+Decidability      | 5.7               | ACC
+Quiz              | 5.8               | PERF
+Gamification      | 6                 | REL
+Global UX/A11y    | 7                 | ACC
+
+================================================================================
+14. RELEASE ROADMAP (PRODUCT, NOT SCHEDULE)
+================================================================================
+
+See project PLAN document for sprint breakdown; phases typically:
+Phase A — Foundation & FA core; Phase B — RE & minimization; Phase C — CFG/PDA;
+Phase D — TM & decidability intro; Phase E — complexity & polish; Phase F —
+gamification depth & educator tools.
+
+================================================================================
+15. GLOSSARY
+================================================================================
+
+Accepting State: State in which input may be accepted if consumed per model rules.
+Configuration (PDA/TM): Full snapshot needed for one computation step.
+Derivation: Sequence of rule applications producing a string from a grammar start.
+Reduction: Mapping instances of problem A to problem B preserving answers.
+
+================================================================================
+END OF DOCUMENT
+================================================================================
