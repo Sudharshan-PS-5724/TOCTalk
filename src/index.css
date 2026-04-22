@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Cyberpunk red / black + cyan wires. Typography palette aligned with editorial sites (e.g. #0c0c0c / #F5F6F4 on awwwards.com showcases). */
+    --background: 0 0% 5%;
+    --foreground: 120 6% 96%;
+
+    --card: 0 0% 9%;
+    --card-foreground: 120 6% 96%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 120 6% 96%;
+
+    --primary: 355 100% 54%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 186 100% 48%;
+    --secondary-foreground: 0 0% 6%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 150 6% 65%;
+
+    --accent: 355 60% 16%;
+    --accent-foreground: 355 95% 72%;
+
+    --destructive: 355 90% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 12%;
+    --ring: 186 100% 50%;
+
+    --automata-primary: 355 95% 52%;
+    --automata-primary-foreground: 0 10% 98%;
+    --automata-secondary: 355 75% 38%;
+    --automata-secondary-foreground: 0 10% 98%;
+    --automata-success: 186 85% 48%;
+    --automata-success-foreground: 0 0% 6%;
+    --automata-warning: 43 96% 55%;
+    --automata-warning-foreground: 0 0% 8%;
+    --automata-current: 355 95% 52%;
+    --automata-current-foreground: 0 10% 98%;
+    --automata-start: 186 100% 48%;
+    --automata-start-foreground: 0 10% 98%;
+    --automata-accept: 355 85% 45%;
+    --automata-accept-foreground: 0 10% 98%;
+    --automata-transition: 186 80% 48%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(355 100% 48%), hsl(355 70% 32%));
+    --gradient-canvas: linear-gradient(160deg, hsl(0 0% 5%) 0%, hsl(195 35% 8%) 100%);
+    
+    /* Shadows */
+    --shadow-state: 0 4px 6px -1px hsl(0 84% 60% / 0.1), 0 2px 4px -1px hsl(0 84% 60% / 0.06);
+    --shadow-canvas: 0 10px 15px -3px hsl(220 13% 46% / 0.1), 0 4px 6px -2px hsl(220 13% 46% / 0.05);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 120 6% 94%;
+    --sidebar-primary: 355 100% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 120 6% 92%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 186 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-primary-foreground font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground font-medium py-2 px-4 rounded-lg border border-border transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+  
+  .card {
+    @apply bg-card rounded-xl shadow-sm border border-border p-6 hover:shadow-md transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200;
+  }
+  
+  .tooltip {
+    @apply absolute z-10 px-2 py-1 text-sm text-popover-foreground bg-popover rounded opacity-0 pointer-events-none transition-opacity duration-200;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-[hsl(355_100%_58%)] via-[hsl(355_80%_45%)] to-[hsl(186_100%_52%)] bg-clip-text text-transparent;
+  }
+
+  .font-pixel {
+    font-family: 'Press Start 2P', ui-monospace, monospace;
+  }
+
+  .pixel-surface {
+    @apply border-[3px] border-[#1e293b] shadow-pixel;
+    image-rendering: pixelated;
+  }
+
+  /* React Flow: default stylesheet uses muted #b1b1b7 — too weak on dark UI */
+  .react-flow__edge-path {
+    stroke: hsl(186 100% 52%);
+    stroke-width: 2.5;
+  }
+
+  
+  .glass-effect {
+    @apply backdrop-blur-sm bg-card/80 border border-border/20;
+  }
+  
+  /* GSAP Animation Classes */
+  .gsap-fade-in { opacity: 0; transform: translateY(20px); }
+  .gsap-slide-in-left { opacity: 0; transform: translateX(-50px); }
+  .gsap-slide-in-right { opacity: 0; transform: translateX(50px); }
+  .gsap-scale-in { opacity: 0; transform: scale(0.8); }
+  .gsap-bounce-in { opacity: 0; transform: scale(0.3); }
+  .gsap-rotate-in { opacity: 0; transform: rotate(-10deg) scale(0.8); }
+  .gsap-stagger-item { opacity: 0; transform: translateY(30px); }
+  
+  .text-shadow { text-shadow: 0 2px 4px hsl(0 0% 0% / 0.1); }
+  .shadow-soft { box-shadow: var(--shadow-canvas); }
+  .gradient-bg { background: var(--gradient-canvas); }
+  .red-gradient { background: var(--gradient-primary); }
+  .white-gradient { background: var(--gradient-canvas); }
+  
+  /* Automata specific utilities */
+  .automata-state {
+    @apply rounded-full border-2 border-automata-transition flex items-center justify-center text-sm font-semibold;
+    box-shadow: var(--shadow-state);
+    transition: var(--transition-smooth);
+  }
+  
+  .automata-state-start {
+    background-color: hsl(var(--automata-start));
+    color: hsl(var(--automata-start-foreground, 0 0% 98%));
+  }
+  
+  .automata-state-accept {
+    background-color: hsl(var(--automata-accept));
+    color: hsl(var(--automata-accept-foreground, 0 0% 98%));
+  }
+  
+  .automata-state-current {
+    background-color: hsl(var(--automata-current));
+    color: hsl(var(--automata-current-foreground, 0 0% 98%));
+  }
+  
+  .automata-state-regular {
+    background-color: hsl(var(--automata-primary) / 0.1);
+    color: hsl(var(--automata-primary));
+  }
+  
+  .automata-transition-line {
+    stroke: hsl(var(--automata-transition));
+    stroke-width: 2;
+  }
+  
+  .automata-transition-label {
+    fill: hsl(var(--automata-transition));
+    font-size: 12px;
+    text-anchor: middle;
+  }
+} 
